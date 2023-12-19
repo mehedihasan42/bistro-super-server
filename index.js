@@ -69,6 +69,12 @@ async function run() {
         res.send(result)
     })
 
+    app.post('/menu',async(req,res)=>{
+      const newItem = req.body;
+      const result = await menuCollection.insertOne(newItem)
+      res.send(result)
+    })
+
     app.get('/user',verifyJWT,verifyAdmin,async(req,res)=>{
       const result = await userCollection.find().toArray()
       res.send(result)
