@@ -48,6 +48,7 @@ async function run() {
     const menuCollection = client.db("bossDB").collection("menu")
     const shopCollection = client.db("bossDB").collection("shop")
     const userCollection = client.db("bossDB").collection("user")
+    const paymentCollection = client.db("bossDB").collection("payment")
 
     app.post('/jwt',(req,res)=>{
       const user = req.body;
@@ -81,6 +82,16 @@ async function run() {
       const query = {_id: new ObjectId(id)}
       const result = await menuCollection.deleteOne(query)
       res.send(result)
+    })
+
+    app.post('/payment',verifyJWT,async(req,res)=>{
+      const payment = req.body;
+      const insertResult = await paymentCollection.insertOne(payment)
+
+      const query = {_id: {$in: payment.shopId.map(id=>new ObjectId(id))}}
+      const deleteResult = await shopCollection.deleteMany(query)
+
+      res.send({insertResult,deleteResult})
     })
 
     app.get('/user',verifyJWT,verifyAdmin,async(req,res)=>{
